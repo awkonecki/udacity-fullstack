@@ -3,6 +3,21 @@
     <title>Todo App</title>
 </head>
 <body>
+    <!-- /create-todo is the name of the route -->
+    <!-- post is the name of the route method (post|get) -->
+    <!-- post send off a http request of method POST which sends off a request of path create-todo
+         data is sent as a response body of the request of field1=value1&field2=value2  -->
+    <!-- get request sends off a request of the method GET with the following appended 
+         /create-todo?field1=value1&field2=value2 -->
+    <form action="/todos/create" method="post">
+        <div>
+            <label for="name">Create a To-Do Item</label>
+            <input type="text" id="description" name="description" />
+        </div>
+        <div>
+            <input type="submit" id="submit" value="Create" />
+        </div>
+    </form>
     <ul>
         {% for d in data %}
         <li>{{ d.description }}</li>
