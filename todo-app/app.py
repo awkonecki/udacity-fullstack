@@ -1,9 +1,13 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy
+
+import sys
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://nebo@localhost:5432/todo-app'
-db = SQLAlchemy(app)
+db = SQLAlchemy(app,
+# session_options={"expire_on_commit": False} # provides a means that after a commit data in the session is invalid.
+)
 
 class Todo(db.Model):
     __tablename__ = 'todos'
@@ -15,6 +19,20 @@ class Todo(db.Model):
 
 db.create_all()
 
+def create_todo_entry(description):
+    try:
+        todo = Todo(description=description)
+        db.session.add(todo)
+        db.session.commit()
+        error=False
+    except:
+        db.session.rollback()
+        error=True
+        print(sys.exc_info())
+    finally:
+        db.session.close()
+        return error
+
 @app.route('/')
 def index():
     return render_template('index.html', data=Todo.query.all())
@@ -25,11 +43,12 @@ def create_todo():
     # description = request.form.get('description', '')
     # AJAX Asynch submission
     description = request.get_json()["description"]
-    newTodo = Todo(description=description)
-    db.session.add(newTodo)
-    db.session.commit()
-    return jsonify({
-        'description': newTodo.description
-    })
+    error = create_todo_entry(description)
+    if (error):
+        abort(500)
+    else:
+        return jsonify({
+            'description': description
+        })
     # must be the name of the route handler
     # return redirect(url_for('index'))
