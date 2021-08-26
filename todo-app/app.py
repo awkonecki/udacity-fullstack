@@ -54,7 +54,7 @@ def update_todo_entry(todo_id, entry_status):
 
 @app.route('/')
 def index():
-    return render_template('index.html', data=Todo.query.all())
+    return render_template('index.html', data=Todo.query.order_by('id').all())
 
 @app.route('/todos/<int:todo_id>/checked', methods=['POST'])
 def checkCompleted(todo_id):
