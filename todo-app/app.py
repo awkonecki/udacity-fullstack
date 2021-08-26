@@ -37,9 +37,33 @@ def create_todo_entry(description):
         db.session.close()
         return error
 
+def update_todo_entry(todo_id, entry_status):
+    try:
+        todo_item = Todo.query.get(todo_id)
+        todo_item.completed = entry_status
+        # db.session.update(todo_item)
+        db.session.commit()
+        error = False
+    except:
+        db.session.rollback()
+        error = True
+        print(sys.exc_info())
+    finally:
+        db.session.close()
+        return error
+
 @app.route('/')
 def index():
     return render_template('index.html', data=Todo.query.all())
+
+@app.route('/todos/<int:todo_id>/checked', methods=['POST'])
+def checkCompleted(todo_id):
+    completed = request.get_json()["completed"]
+    error = update_todo_entry(todo_id, completed)
+    if (error):
+        abort(500)
+    else:
+        return redirect(url_for('index'))
 
 @app.route('/todos/create', methods=['POST'])
 def create_todo():
