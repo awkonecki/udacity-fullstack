@@ -9,6 +9,20 @@
             list-style: none;
             padding: 0;
             margin: 0;
+            width: 200px;
+        }
+        li {
+            clear: both;
+        }
+        li button {
+            -webkit-appearance: none;
+            border: none;
+            outline: none;
+            color: red;
+            float: right;
+            cursor: pointer;
+            font-size: 20px;
+            background-color: white;
         }
     </style>
 </head>
@@ -65,10 +79,31 @@
     <div id="error" class="hidden">Something went wrong!</div>
     <ul id="todos-unordered-list">
         {% for d in data %}
-        <li><input class="check-completed" data-id="{{ d.id }}" type="checkbox" {% if d.completed %} checked {% endif %} />{{ d.description }}</li>
+        <li>
+            <input class="check-completed" data-id="{{ d.id }}" type="checkbox" {% if d.completed %} checked {% endif %} />
+            {{ d.description }}
+            <button class="delete-todo" type="button" data-id="{{ d.id }}">&cross;</button>
+        </li>
         {% endfor %}
     </ul>
     <script>
+        const deletebuttons = document.querySelectorAll('.delete-todo');
+        for (let i = 0; i < deletebuttons.length; i++) {
+            deletebuttons[i].onclick = function(e) {
+                console.log('event', e)
+                const todoId = e.target.dataset['id'];
+                fetch('/todos/' + todoId + '/delete', {
+                    method: 'DELETE',
+                })
+                .then(function() {
+                    document.getElementById('error').className = 'hidden'
+                })
+                .catch(function() {
+                    document.getElementById('error').className = ''
+                })
+            }
+        }
+
         const checkboxes = document.querySelectorAll('.check-completed');
         for (let i = 0; i < checkboxes.length; i++) {
             const checkbox = checkboxes[i];

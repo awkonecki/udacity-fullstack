@@ -52,9 +52,30 @@ def update_todo_entry(todo_id, entry_status):
         db.session.close()
         return error
 
+def delete_todo_entry(todo_id):
+    try:
+        # todo_item = Todo.query.get(todo_id)
+        # db.session.delete(todo_item)
+        # db.session.commit()
+        Todo.query.filter_by(id=todo_id).delete()
+        db.session.commit()
+        error = False
+    except:
+        db.session.rollback()
+        error = True
+        print(sys.exc_info())
+    finally:
+        db.session.close()
+        return error
+
 @app.route('/')
 def index():
     return render_template('index.html', data=Todo.query.order_by('id').all())
+
+@app.route('/todos/<int:todo_id>/delete', methods=['DELETE'])
+def deleteTodo(todo_id):
+    error = delete_todo_entry(todo_id)
+    return jsonify({ "success": True })
 
 @app.route('/todos/<int:todo_id>/checked', methods=['POST'])
 def checkCompleted(todo_id):
