@@ -24,6 +24,10 @@
             font-size: 20px;
             background-color: white;
         }
+        .lists-wrapper, .todos-wrapper {
+            display: inline-block;
+            vertical-align: top;
+        }
     </style>
 </head>
 <body>
@@ -67,25 +71,47 @@
 
           -->
     <!-- <form action="/todos/create" method="post"> -->
-    <form id="form">
-        <div>
-            <label for="name">Create a To-Do Item</label>
-            <input type="text" id="description" name="description" />
-        </div>
-        <div>
-            <input type="submit" id="submit" value="Create" />
-        </div>
-    </form>
-    <div id="error" class="hidden">Something went wrong!</div>
-    <ul id="todos-unordered-list">
-        {% for d in data %}
-        <li>
-            <input class="check-completed" data-id="{{ d.id }}" type="checkbox" {% if d.completed %} checked {% endif %} />
-            {{ d.description }}
-            <button class="delete-todo" type="button" data-id="{{ d.id }}">&cross;</button>
-        </li>
-        {% endfor %}
-    </ul>
+    <div class="lists-wrapper">
+        <form id="lists-form">
+            <div>
+                <label for="name">Create a To-Do List</label>
+                <input type="text" id="list-description" name="list-description" />
+            </div>
+            <div>
+                <input type="submit" id="submit-list" value="Create List" />
+            </div>
+        </form>
+        <ul id="lists">
+            {% for list in lists %}
+                <li>
+                    <a href="/lists/{{ list.id }}">{{ list.name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="todos-wrapper">
+        <h4>{{ active_list.name }} </h4>
+        <form id="form">
+            <div>
+                <label for="name">Create a To-Do Item</label>
+                <input type="text" id="description" name="description" />
+            </div>
+            <div>
+                <input type="submit" id="submit" value="Create" />
+            </div>
+        </form>
+        <div id="error" class="hidden">Something went wrong!</div>
+        <ul id="todos-unordered-list">
+            {% for todo in todos %}
+            <li>
+                <input class="check-completed" data-id="{{ todo.id }}" type="checkbox" {% if todo.completed %} checked {% endif %} />
+                {{ todo.description }}
+                <button class="delete-todo" type="button" data-id="{{ todo.id }}">&cross;</button>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
     <script>
         const deletebuttons = document.querySelectorAll('.delete-todo');
         for (let i = 0; i < deletebuttons.length; i++) {
